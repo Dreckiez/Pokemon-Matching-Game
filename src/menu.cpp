@@ -10,12 +10,13 @@ int finishMenu = 0;
 int menutitleposx = 0, menutitleposy = 0;
 int menucurpos = 0;
 int menuoptionx = 0, menuoptiony = 0;
-int menustate = 0, menustateprev =  -1;
+int menustate = 0;                          //Determine what screen will be draw: 0 = login screen, 1 = register screen, 2 = menu screen
 int logintitlex = 0, logintitley = 0;
 int inputbar = 0, inputstate = -1;
 const char *menu[] ={"Play", "Leaderboard", "Exit"};
 string loginusername, loginpassword, regusername, regpassword, username;
 
+//Set the initial values for some variables
 void InitTitleScreen(){
     logintitlex = GetScreenWidth()/2 - MeasureTextEx(font, "LOGIN", 100, 0).x - 20;
     logintitley = GetScreenHeight()/2 - MeasureTextEx(font, "LOGIN", 100, 0).y - 180;
@@ -23,12 +24,14 @@ void InitTitleScreen(){
     menutitleposy = GetScreenHeight()/2 + 30 - MeasureTextEx(font, "Pikachu", 125 , 0).y;
     menuoptionx = menutitleposx + 550;
     menuoptiony = menutitleposy - 30;
+
+    finishMenu = 0;
 }
 
 void UpdateTitleScreen(){
-    if (menustate == 0){ // Login
+    if (menustate == 0){ // Login screen
         int key = GetCharPressed();
-        while (key > 0)
+        while (key > 0) //input character when a key is pressed
         {
             if (inputbar == 0){
                 if ((key >= 32) && (key <= 125)) loginusername += (char)key;
@@ -38,7 +41,7 @@ void UpdateTitleScreen(){
             }
             key = GetCharPressed();
         }
-        if (IsKeyPressed(KEY_BACKSPACE)){
+        if (IsKeyPressed(KEY_BACKSPACE)){ //deleteing character in string when pressing backspace
             if (inputbar == 0){
                 if (!loginusername.empty()) loginusername.pop_back();
             }
@@ -46,7 +49,7 @@ void UpdateTitleScreen(){
                 if (!loginpassword.empty()) loginpassword.pop_back();
             }
         }
-        if (IsKeyPressed(KEY_TAB)){
+        if (IsKeyPressed(KEY_TAB)){ //switching between username bar, password bar, login button and register option
             inputbar++;
             if (inputbar == 4) inputbar = 0;
         }
@@ -54,7 +57,7 @@ void UpdateTitleScreen(){
             menustate = 1;
             inputbar = 0;
         } 
-        else if (IsKeyPressed(KEY_ENTER) && inputbar == 2){
+        else if (IsKeyPressed(KEY_ENTER) && inputbar == 2){ // If login button is pressed, check if the username and password are correct
             ifstream fin;
             fin.open("Players.txt");
             if(!fin) fin.open("Players.txt");
@@ -63,23 +66,23 @@ void UpdateTitleScreen(){
                 stringstream ss(line);
                 getline(ss, checkuser, '|');
                 getline(ss, checkpass, '|');
-                if (loginusername != checkuser || loginpassword != checkpass) inputstate = 0;
+                if (loginusername != checkuser || loginpassword != checkpass) inputstate = 0; // 
                 else{
                     inputstate = 2;
                     break;
                 }
             }
             fin.close();
-            if (inputstate == 2){
+            if (inputstate == 2){ // If username and password are correct, change to menu screen
                 username = loginusername;
                 menustate = 2;
             }
         }
 
     }
-    else if (menustate == 1){ //Register
+    else if (menustate == 1){ //Register screen
         int key = GetCharPressed();
-        while (key > 0)
+        while (key > 0) //input character when a key is pressed
         {
             if (inputbar == 0){
                 if ((key >= 32) && (key <= 125)) regusername += (char)key;
@@ -89,7 +92,7 @@ void UpdateTitleScreen(){
             }
             key = GetCharPressed();
         }
-        if (IsKeyPressed(KEY_BACKSPACE)){
+        if (IsKeyPressed(KEY_BACKSPACE)){ //deleteing character in string when pressing backspace
             if (inputbar == 0){
                 if (!regusername.empty()) regusername.pop_back();
             }
@@ -97,13 +100,13 @@ void UpdateTitleScreen(){
                 if (!regpassword.empty()) regpassword.pop_back();
             }
         }
-        if (IsKeyPressed(KEY_TAB)){
+        if (IsKeyPressed(KEY_TAB)){ //switching between username bar, password bar and register button
             inputbar++;
             if (inputbar == 3) inputbar = 0;
         }
-        if (IsKeyPressed(KEY_ENTER) && inputbar == 2){
+        if (IsKeyPressed(KEY_ENTER) && inputbar == 2){ //Check if username is taken
             inputstate = 2;
-            ifstream fin; //Check if username is taken
+            ifstream fin; 
             fin.open("Players.txt");
             if(!fin) fin.open("Players.txt");
             string checkuser, line;
@@ -117,18 +120,18 @@ void UpdateTitleScreen(){
                 else inputstate = 2;
             }
             fin.close();
-            if (inputstate == 2){
+            if (inputstate == 2){ // If username is not taken, save the player username and password to text file
                 ofstream fout;
                 fout.open("Players.txt", ios::app);
                 if (!fout) fout.open("Players.txt", ios::app);
                 fout << regusername << '|' << regpassword << '|' << 0 << '\n';
                 fout.close();
                 username = regusername;
-                menustate = 2; //Change to Main Menu
+                menustate = 2; //Change to Menu screen
             }
         }
     }
-    else if (menustate == 2){ // Main Menu
+    else if (menustate == 2){ // Main Menu screen
         if (IsKeyPressed(KEY_DOWN)) menucurpos++;
         if (IsKeyPressed(KEY_UP)) menucurpos--;
         if (menucurpos < 0) menucurpos = 2;
@@ -137,13 +140,13 @@ void UpdateTitleScreen(){
             switch (menucurpos)
             {
                 case 0:
-                    finishMenu = 2;
+                    finishMenu = 2; // Change to Gameplay screen
                     break;
                 case 1:
-                    finishMenu = 1;
+                    finishMenu = 4; // Change to Leaderboard screen
                     break;
                 case 2:
-                    finishMenu = 3;
+                    finishMenu = 3; // Exit the game
                 default:
                     break;
             }
@@ -153,15 +156,15 @@ void UpdateTitleScreen(){
 }
 
 void DrawTitleScreen(){
-    if (menustate == 0){
+    if (menustate == 0){ // Draw the Login box
         DrawText("Pikachu", menutitleposx, menutitleposy, 125, BLACK);
         for (int i = 0; i < 3; i++){
             DrawText(TextFormat("%s", menu[i]), menuoptionx, menuoptiony + i * 80, 50, BLACK);
         }
         DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(RAYWHITE, 0.6));
 
-        DrawRectangle(298, 35, 700, 590, WHITE);
-        DrawRectangleLines(298, 35, 700, 590, BLACK);
+        DrawRectangle(logintitlex - 202, logintitley - 57, 700, 590, WHITE);
+        DrawRectangleLines(logintitlex - 202, logintitley - 57, 700, 590, BLACK);
 
         DrawText("LOGIN", logintitlex, logintitley, 100, BLACK);
         DrawText("Username:", logintitlex + 5, logintitley + 110, 25, BLACK);
@@ -200,15 +203,15 @@ void DrawTitleScreen(){
         if (inputstate == 0)
             DrawText("Incorrect username or password. Please try again", logintitlex - 100, logintitley + 340, 20, RED);
     }
-    else if (menustate == 1){
+    else if (menustate == 1){ // Draw the Register box
         DrawText("Pikachu", menutitleposx, menutitleposy, 125, BLACK);
         for (int i = 0; i < 3; i++){
             DrawText(TextFormat("%s", menu[i]), menuoptionx, menuoptiony + i * 80, 50, BLACK);
         }
         DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(RAYWHITE, 0.6));
 
-        DrawRectangle(298, 35, 700, 590, WHITE);
-        DrawRectangleLines(298, 35, 700, 590, BLACK);
+        DrawRectangle(logintitlex - 202, logintitley - 57, 700, 590, WHITE);
+        DrawRectangleLines(logintitlex - 202, logintitley - 57, 700, 590, BLACK);
 
         DrawText("Register", logintitlex - 62, logintitley, 100, BLACK);
 
@@ -244,7 +247,7 @@ void DrawTitleScreen(){
         if (inputstate == 1)
             DrawText("Username has been taken!", logintitlex - 15, logintitley + 335, 25, RED);
     }
-    else if (menustate == 2){
+    else if (menustate == 2){ // Draw the Menu screen
         DrawText(TextFormat("Welcome %s,", &username[0]), menutitleposx, menuoptiony, 25, BLACK);
 
         DrawText("Pikachu", menutitleposx, menutitleposy, 125, BLACK);

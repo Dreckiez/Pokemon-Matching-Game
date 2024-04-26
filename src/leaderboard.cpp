@@ -29,7 +29,7 @@ void SortList(Player pl[], int n){
     }
 }
 
-void InitOptionsScreen(){
+void InitOptionsScreen(){ // Read all the players data from text file
     ifstream fin;
     fin.open("Players.txt");
     if(!fin) fin.open("Players.txt");
@@ -47,42 +47,45 @@ void InitOptionsScreen(){
     }
     fin.close();
 
-    SortList(Playersss, num);
+    SortList(Playersss, num); // Sort the players according to their score
 
     ldbcenterx = GetScreenWidth()/2 - MeasureTextEx(font, "LEADERBOARD", 100, 0).x;
     ldbcentery = GetScreenHeight()/2 - MeasureTextEx(font, "LEADERBOARD", 100, 0).y;
+
+    finishLeaderboard = 0;
 }
 
 void UpdateOptionsScreen(){
-    if (IsKeyPressed(KEY_ENTER)) finishLeaderboard = 1;
+    if (IsKeyPressed(KEY_ENTER)) finishLeaderboard = 5; //Switch to Menu screen when pressing Enter
 }
 
 
-void DrawOptionsScreen(){
-    DrawText("LEADERBOARD", ldbcenterx + 285, ldbcentery + 60, 100, BLACK);
+void DrawOptionsScreen(){ // Draw the top 10 players with highest score
+
+    DrawText("LEADERBOARD", ldbcenterx - 23, ldbcentery - 212, 100, BLACK);
     if (num < 10){
         for (int i = 0; i < num; i++){
-            DrawText(TextFormat("%i", i + 1), ldbcenterx + 340, ldbcentery + 200 + i * 50, 23, BLACK);
-            DrawText(TextFormat("%s", &Playersss[i].username[0]), ldbcenterx + 480, ldbcentery + 200 + i * 50, 23, BLACK);
-            DrawText(TextFormat("%i", Playersss[i].score), ldbcenterx + 940, ldbcentery + 200 + i * 50, 23, BLACK);
+            DrawText(TextFormat("%i", i + 1), ldbcenterx + 32, ldbcentery - 72 + i * 50, 23, BLACK);
+            DrawText(TextFormat("%s", &Playersss[i].username[0]), ldbcenterx + 172, ldbcentery - 72 + i * 50, 23, BLACK);
+            DrawText(TextFormat("%i", Playersss[i].score), ldbcenterx + 632,  ldbcentery - 72 + i * 50, 23, BLACK);
         }
         for (int i = num; i < 10; i++){
-            DrawText("-", ldbcenterx + 340, ldbcentery + 200 + i * 50, 23, BLACK);
-            DrawText("NULL", ldbcenterx + 480, ldbcentery + 200 + i * 50, 23, BLACK);
-            DrawText("100", ldbcenterx + 940, ldbcentery + 200 + i * 50, 23, BLACK);
+            DrawText("-", ldbcenterx + 32, ldbcentery - 72 + i * 50, 23, BLACK);
+            DrawText("empty", ldbcenterx + 172, ldbcentery - 72 + i * 50, 23, BLACK);
+            DrawText("_", ldbcenterx + 632,  ldbcentery - 72 + i * 50, 23, BLACK);
         }
     }
     else {
         for (int i = 0; i < 10; i++){
-            DrawText(TextFormat("%i", i + 1), ldbcenterx + 340, ldbcentery + 200 + i * 50, 23, BLACK);
-            DrawText(TextFormat("%s", &Playersss[i].username[0]), ldbcenterx + 480, ldbcentery + 200 + i * 50, 23, BLACK);
-            DrawText(TextFormat("%i", Playersss[i].score), ldbcenterx + 940, ldbcentery + 200 + i * 50, 23, BLACK);
+            DrawText(TextFormat("%i", i + 1), ldbcenterx + 32, ldbcentery - 72 + i * 50, 23, BLACK);
+            DrawText(TextFormat("%s", &Playersss[i].username[0]), ldbcenterx + 172, ldbcentery - 72 + i * 50, 23, BLACK);
+            DrawText(TextFormat("%i", Playersss[i].score), ldbcenterx + 632,  ldbcentery - 72 + i * 50, 23, BLACK);
         }
     }
 }
 
 void UnloadOptionsScreen(){
-
+    num = 0;
 }
 
 

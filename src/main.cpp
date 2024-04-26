@@ -19,16 +19,17 @@ bool onTransition = false;
 bool transFadeOut = false;
 int transFromScreen = -1;
 GameScreen transToScreen = UNKNOWN;
+int exitstate = 0;
 
-void ChangeToScreen(GameScreen);
+void ChangeToScreen(int screen);
 
-void TransitionToScreen(GameScreen);
+void TransitionToScreen(int screen);
 void UpdateTransition();
 void DrawTransition();
 void UpdateDrawFrame();
 
-int main(void)
-{
+int main(){
+
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(screenWidth, screenHeight, "Pikachu");
     DisableCursor();
@@ -50,15 +51,14 @@ int main(void)
     InitLogoScreen();
     SetTargetFPS(60);
 
-    while (!WindowShouldClose())
-    {
+    while (exitstate == 0){
         UpdateDrawFrame();
     }
 
-    switch (currentScreen)
-    {
+    switch (currentScreen){
         case LOGO: UnloadLogoScreen(); break;
         case TITLE: UnloadTitleScreen(); break;
+        case OPTIONS: UnloadOptionsScreen(); break;
         case GAMEPLAY: UnloadGameplayScreen(); break;
         case ENDING: UnloadEndingScreen(); break;
         default: break;
@@ -78,21 +78,20 @@ int main(void)
     return 0;
 }
 
-void ChangeToScreen(GameScreen screen)
-{
-    switch (currentScreen)
-    {
+void ChangeToScreen(GameScreen screen){
+    switch (currentScreen){
         case LOGO: UnloadLogoScreen(); break;
         case TITLE: UnloadTitleScreen(); break;
+        case OPTIONS: UnloadOptionsScreen(); break;
         case GAMEPLAY: UnloadGameplayScreen(); break;
         case ENDING: UnloadEndingScreen(); break;
         default: break;
     }
 
-    switch (screen)
-    {
+    switch (screen){
         case LOGO: InitLogoScreen(); break;
         case TITLE: InitTitleScreen(); break;
+        case OPTIONS: InitOptionsScreen(); break;
         case GAMEPLAY: InitGameplayScreen(); break;
         case ENDING: InitEndingScreen(); break;
         default: break;
@@ -101,8 +100,7 @@ void ChangeToScreen(GameScreen screen)
     currentScreen = screen;
 }
 
-void TransitionToScreen(GameScreen screen)
-{
+void TransitionToScreen(GameScreen screen){
     onTransition = true;
     transFadeOut = false;
     transFromScreen = currentScreen;
@@ -110,16 +108,12 @@ void TransitionToScreen(GameScreen screen)
     transAlpha = 0.0f;
 }
 
-void UpdateTransition()
-{
-    if (!transFadeOut)
-    {
+void UpdateTransition(){
+    if (!transFadeOut){
         transAlpha += 0.05f;
-        if (transAlpha > 1.01f)
-        {
+        if (transAlpha > 1.01f){
             transAlpha = 1.0f;
-            switch (transFromScreen)
-            {
+            switch (transFromScreen){
                 case LOGO: UnloadLogoScreen(); break;
                 case TITLE: UnloadTitleScreen(); break;
                 case OPTIONS: UnloadOptionsScreen(); break;
@@ -128,10 +122,10 @@ void UpdateTransition()
                 default: break;
             }
 
-            switch (transToScreen)
-            {
+            switch (transToScreen){
                 case LOGO: InitLogoScreen(); break;
                 case TITLE: InitTitleScreen(); break;
+                case OPTIONS: InitOptionsScreen(); break;
                 case GAMEPLAY: InitGameplayScreen(); break;
                 case ENDING: InitEndingScreen(); break;
                 default: break;
@@ -141,11 +135,9 @@ void UpdateTransition()
             transFadeOut = true;
         }
     }
-    else
-    {
+    else{
         transAlpha -= 0.02f;
-        if (transAlpha < -0.01f)
-        {
+        if (transAlpha < -0.01f){
             transAlpha = 0.0f;
             transFadeOut = false;
             onTransition = false;
@@ -155,51 +147,42 @@ void UpdateTransition()
     }
 }
 
-void DrawTransition()
-{
+void DrawTransition(){
     DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BLACK, transAlpha));
 }
 
-
-void UpdateDrawFrame()
-{
+//Draw the screens
+void UpdateDrawFrame(){
     UpdateMusicStream(music);
 
-    if (!onTransition)
-    {
-        switch(currentScreen)
-        {
-            case LOGO:
-            {
+    if (!onTransition){
+        switch(currentScreen){
+            case LOGO:{
                 UpdateLogoScreen();
 
                 if (FinishLogoScreen() == 1) TransitionToScreen(TITLE);
             } break;
-            case TITLE:
-            {
+            case TITLE:{
                 UpdateTitleScreen();
 
-                if (FinishTitleScreen() == 1) TransitionToScreen(OPTIONS);
+                if (FinishTitleScreen() == 4) TransitionToScreen(OPTIONS);
                 else if (FinishTitleScreen() == 2) TransitionToScreen(GAMEPLAY);
-                else if (FinishTitleScreen() == 3) TransitionToScreen(ENDING);
+                else if (FinishTitleScreen() == 3) exitstate = 1;
             } break;
-            case OPTIONS:
-            {
+            case OPTIONS:{
                 UpdateOptionsScreen();
 
-                if (FinishOptionsScreen() == 1) TransitionToScreen(TITLE);
+                if (FinishOptionsScreen() == 5) TransitionToScreen(TITLE);
             } break;
-            case GAMEPLAY:
-            {
+            case GAMEPLAY:{
                 UpdateGameplayScreen();
 
-                if (FinishGameplayScreen() == 1) TransitionToScreen(ENDING);
+                if (FinishGameplayScreen() == 6) TransitionToScreen(ENDING);
             } break;
-            case ENDING:
-            {
+            case ENDING:{
                 UpdateEndingScreen();
 
-                if (FinishEndingScreen() == 1) TransitionToScreen(TITLE);
+                if (FinishEndingScreen() == 7) TransitionToScreen(TITLE);
             } break;
             default: break;
         }
@@ -208,8 +191,7 @@ void UpdateDrawFrame()
 
     BeginDrawing();
         ClearBackground(RAYWHITE);
-        switch(currentScreen)
-        {
+        switch(currentScreen){
             case LOGO: DrawLogoScreen(); break;
             case TITLE: DrawTitleScreen(); break;
             case OPTIONS: DrawOptionsScreen(); break;

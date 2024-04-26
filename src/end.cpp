@@ -34,6 +34,7 @@ void ListSort(Player pl[], int n){
     }
 }
 
+// Read all the players data from text file
 void InitEndingScreen(){
     ifstream fin;
     fin.open("Players.txt");
@@ -54,12 +55,13 @@ void InitEndingScreen(){
 
     endcenterx = GetScreenWidth()/2 - MeasureTextEx(font, "LEADERBOARD", 100, 0).x;
     endcentery = GetScreenHeight()/2 - MeasureTextEx(font, "LEADERBOARD", 100, 0).y;
+    finishEnd = 0;
 }
 
 void UpdateEndingScreen(){
-    ListSort(Players, n);
+    ListSort(Players, n); // Sort the players according to their score
 
-    for (int i = 0; i <= n; i++){
+    for (int i = 0; i <= n; i++){ // Update the current player score
         if (username == Players[i].username){
             Players[i].score = Highscore + 60000/(36000-timerlifetime);
             ldb_idx = i + 1;
@@ -68,7 +70,7 @@ void UpdateEndingScreen(){
         }
     }
 
-    if (IsKeyPressed(KEY_ENTER))
+    if (IsKeyPressed(KEY_ENTER)) // Save the players data to text file and switch to Menu screen
     {
         ofstream fout;
         fout.open("Players.txt");
@@ -77,11 +79,12 @@ void UpdateEndingScreen(){
             fout << Players[i].username << '|' << Players[i].pass << '|' << Players[i].score << '\n';
         }
         fout.close();
-        finishEnd = 1;
+        finishEnd = 7;
         PlaySound(fxChange);
     }
 }
 
+//Draw the Leaderboard, the score, time bonus and total score 
 void DrawEndingScreen(){
     DrawText("LEADERBOARD", endcenterx - 30, endcentery - 230, 100, BLACK);
 
