@@ -5,7 +5,7 @@ This project was created based on the [Raylib](https://www.raylib.com/) library.
 >"raylib is a programming library to enjoy videogames programming; no fancy interface, no visual helpers, no gui tools or editors... just coding in pure spartan-programmers way."\
 >-From Raylib website-
 
-![](./images/raylib%20web.png)
+![](./src/images/raylib%20web.png)
 
 ## About the game
 The game starts with a board filled with squares containing different letters. Your task is to remove all pairs of matching letters by selecting them. A pair of letters is considered matching if they can
@@ -15,8 +15,8 @@ Noted that select a blank character won’t do anything.
 
 ## Screenshots and Demo Video
 
-![](./images/435735833_813208167395779_5923070072161509011_n.png)
+![](./src/images/435735833_813208167395779_5923070072161509011_n.png)
 
-![](./images/image.png)
+![](./src/images/image.png)
 
 [Demo Video](https://www.youtube.com/watch?v=tCnd2iCCf2M)
